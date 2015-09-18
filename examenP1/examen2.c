@@ -2,25 +2,8 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <time.h>
-//#include <cstdlib.h>
 
 #define N 0
-
-typedef struct
-{
-    char* nombre;
-    char* apellidos;
-    int edad;
-    char* telefono;
-    int cama;
-} Paciente;
-
-typedef struct
-{
-    Paciente * paciente;
-} Cama;
-
-
 
 
 typedef struct
@@ -46,15 +29,14 @@ typedef struct
     
 } Edificacion;
 
+typedef struct
+{
+	int numero;
+	char* fecha;
+}RelacionFechas;
 
-void freeAll(Cama * , Paciente * , int , int );
-void quePacienteEnQueCama(Cama *, int );
-void llegaPaciente (Paciente ** , Cama ** , int*, int*);
-int cuantosPacientes(Paciente * );
-int cuantasCamas(Cama * );
+//void freeAll(Cama * , Paciente * , int , int );
 
-void verPacientes(Paciente * , int );
-void contarCamas(Cama * , int );
 void agregarPersona(Persona **, int*);
 void verPersonas(Persona * , int );
 void editarPersona(Persona ** p, int* personas);
@@ -66,21 +48,20 @@ void reporte(Persona * p, Edificacion * e, int personas, int edificaciones);
 
 main()
 {
-    printf("%d", strcmp("2000-02-12", "2000-12-12"));
-    srand(time(NULL));
+
+    srand(time(NULL)); //para generar datos
     Persona *p;
     Edificacion *e;
     
     int decision = 1;
     
 
-    p=NULL;//(Paciente*)malloc(0);
-    e=NULL;
-    int personas = 0;
-    int edificaciones = 0;
-    int pacientes = 0;
+    p=NULL;//arreglo de personas
+    e=NULL;//arreglo de edificaciones
+    int personas = 0;//cuantas personas en el arreglo
+    int edificaciones = 0;//cuantas edificaciones en el arreglo
     
-
+    /*MENU*/
     while(decision)
     {
         printf("\nSeleccione su opcion: \n1-Agregar persona\n2-Ver Nomina\n3-Editar nomina\n4-Borrar nomina\n5-Crear Edificacion\n6-Buscar por Empleado y Fecha\n7-Generar Reporte(Personas que modelaron entre fechas) \n0-Salir\n");
@@ -112,138 +93,32 @@ main()
                 verMisModelos(p, e, personas, edificaciones);
                 break;
 			case 7:
-				reporte(p,e,personas,edificaciones);
+				reporte(p,e,personas,edificaciones); //GENERAR REPORTE
 				break;
         }
         
 
     }    
+	/*FIN MENU*/
+
     //freeAll(c, p, pacientes, camas);
     return 0;
 }
 
 
-void llegaPaciente (Paciente ** p, Cama ** c, int* pacientes, int* camas)
-{
 
-    Paciente * aux;;
-    *p = (Paciente *)realloc(*p,(*pacientes+1)*sizeof(Paciente));
-    *pacientes+=1;
 
-    aux = *p + *pacientes - 1;
-
-    (aux)->nombre = malloc(sizeof(char)*20);
-    printf("Ingrese el nombre:\n");
-    scanf("%s", (aux)->nombre);
-    (aux)->apellidos = malloc(sizeof(char)*20);
-    printf("Ingrese el apellido:\n");
-    scanf("%s", (aux)->apellidos);
-    printf("Cual es la edad: \n");
-    scanf("%d", &((aux)->edad));
-    (aux)->telefono = malloc(sizeof(char)*20);
-    printf("Ingrese el telefono:\n");
-    scanf("%s", (aux)->telefono);
-
-    
-    while(1)
-    {   
-        Cama * temp2;
-        Cama * temp = *c + *camas;
-        for( temp2 = *c; temp2 < temp; temp2++)   
-        {
-            if(temp2->paciente == NULL)
-            {
-                temp2->paciente = aux;
-                 printf("Se agrego el paciente #%d a la cama #%d\n", (aux - *p), temp2 - *c);
-                aux->cama=temp2-*c;
-                return;
-            }
-        }
-        
-        *c = (Cama *)realloc(*c,(*camas+5)*sizeof(Cama));  
-        printf("No hay suficientes camas, agregando 5 mas...\n");   
-        *camas+=5;   
-
-    }
-
-}
-
-/*void borrar(Paciente ** p, int aBorrar, int * pacientes)
-{
-    Paciente * temp = (Paciente *)malloc((*pacientes-1)*sizeof(Paciente));
-    memmove(temp, *p, (aBorrar)*sizeof(Paciente));
-    memmove(temp + aBorrar, *p + (aBorrar+1), (*pacientes - aBorrar - 1)*sizeof(Paciente));
-    *pacientes = *pacientes - 1;
-    free (*p);
-    *p = temp;
-    
-}
-*/
-
-void quePacienteEnQueCama(Cama * c, int camas)
-{
-    int numero;
-    printf("Que cama quiere ver?\n");
-    scanf("%d", &numero);
-    if(camas-numero > 1)
-    {
-        if((c+numero)->paciente == NULL)
-        {
-            printf("Esa cama esta vacia\n");
-            return;
-        }
-        printf("El paciente en esta cama es:\nNombre - %s\nApellido - %s\nEdad - %d\nTelefono - %s\n", (c+numero)->paciente->nombre, (c+numero)->paciente->apellidos, (c+numero)->paciente->edad, (c+numero)->paciente->telefono);
-    }
-    else
-        printf("Esa cama no existe\n");
-}
-
-/*void darAltaPaciente(Paciente ** p, Cama ** c, int * pacientes, int * camas)
-{
-    int numero;
-    printf("Que numero de cama desea dar de alta?\n");
-    scanf("%d", &numero);
-    if(camas-numero>1 & (*c+numero)->paciente != NULL)
-    {
-        borrar(p, numero, pacientes);
-        ((*c)+numero)->paciente = NULL;
-    }
-    else
-        printf("Esa cama no tiene paciente o no existe\n");
-}*/
-
-void verPacientes(Paciente * p, int pacientes)
-{
-    Paciente * inicio = p;
-    Paciente * final = p + pacientes;
-    for( ; p < final; p++)
-    printf("Paciente #%d\n\nNombre - %s\nApellido - %s\nEdad - %d\nTelefono - %s\nCama - %d\n",p - inicio, p->nombre, p->apellidos, p->edad, p->telefono, p->cama);
-}
-
-void contarCamas(Cama * c, int camas)
-{
-    int disponibles = 0;
-    
-    Cama* final = c + camas;
-    for( ; c < final; c++)
-    {
-        if(c->paciente == NULL)
-            disponibles++;
-    }	
-    printf("Camas disponibles: %d\nCamas ocupadas: %d\n", disponibles, camas-disponibles);
-}
-
-void freeAll(Cama * c, Paciente * p, int pacientes, int camas)
+/*void freeAll(Cama * c, Paciente * p, int pacientes, int camas)
 {
     int i;
-    /*for (i =0; i<camas; i++)
+    for (i =0; i<camas; i++)
     {
         printf("hola\n");
         free(((c+i)->paciente)->nombre);
         free(((c+i)->paciente)->apellidos);
         free(((c+i)->paciente)->telefono);
         free((c+i)->paciente);
-    }*/
+    }
     free(c);
 
     for(i=0; i<pacientes;i++)
@@ -256,7 +131,7 @@ void freeAll(Cama * c, Paciente * p, int pacientes, int camas)
     free(p);
 }
 
-
+*/
 
 void agregarPersona(Persona ** p, int* personas)
 {
@@ -303,25 +178,14 @@ void editarPersona(Persona ** p, int* personas)
     printf("Que persona");
     scanf("%d", &editar);
 
-    //Persona * aux;
-    //*p = (Persona *)realloc(*p,(*personas+1)*sizeof(Persona));
-    //*personas+=1;
-
-    //aux = *p + *personas - 1;
-
-    //(*p)->nombre = malloc(sizeof(char)*10);
     printf("Ingrese el nombre:\n");
     scanf("%s", (*p+editar)->nombre);
-    //(aux)->apellido = malloc(sizeof(char)*10);
     printf("Ingrese el apellido:\n");
     scanf("%s", (*p+editar)->apellido);
-    //(aux)->nacimiento = malloc(sizeof(char)*10);
     printf("Cuando nacio: \n");
     scanf("%s", (*p+editar)->nacimiento);
-    //(aux)->ingreso = malloc(sizeof(char)*10);
     printf("Cuando se unio: \n");
     scanf("%s", (*p+editar)->ingreso);
-    //(aux)->puesto = malloc(sizeof(char)*10);
     printf("Ingrese el puesto:\n");
     scanf("%s", (*p+editar)->puesto);
     printf("Nomina: \n");
@@ -359,12 +223,10 @@ void crearEdificacion(Edificacion ** e, int * edificaciones)
     
     int temptipo;
     
-    //(aux)->tipo = malloc(sizeof(char)*10);
     printf("Ingrese el tipo (1-Edificio, 2-Torre, 3-Nave):\n");
     scanf("%d", &((aux)->tipo));
     temptipo = (aux)->tipo;
 
-    //(aux)->modales = rand()%5;
     (aux)->periodo = rand()%6;
     (aux)->pisos=rand()%10 + 1;
     (aux)->modales = malloc(sizeof(int)*((aux)->pisos));
@@ -374,7 +236,19 @@ void crearEdificacion(Edificacion ** e, int * edificaciones)
     {
    		*(((aux)->modales) + i) = 5+i;
     }
-    (aux)->fecha = "2015-09-17";
+	switch(rand()%3)
+    {
+		case 0:
+			(aux)->fecha = "2015-09-17";
+			break;
+		case 1:
+			(aux)->fecha = "2015-09-16";
+			break;
+		case 2:
+			(aux)->fecha = "2015-09-15";
+			break;
+	}	
+	
     (aux)->autorNomina = rand()%2 + 1;
     switch (temptipo)
     {
@@ -387,7 +261,6 @@ void crearEdificacion(Edificacion ** e, int * edificaciones)
         case 2:
         {
            (aux)->dependeTipo = malloc(sizeof(int)*(((aux)->pisos) * 2));
-           //(aux)->dependeTipo = rand()%100;
            int fin = ((aux)->pisos) * 2;
            
            for(i = 0 ; i< fin; i++)
@@ -419,12 +292,11 @@ void verMisModelos(Persona * p, Edificacion * e, int personas, int edificaciones
 	int i;
     Edificacion * inicio = e;
     Edificacion * final = e + edificaciones;
-    if(fork()==0)
+    if(fork()==0) //para simular un trabajador activo
     {
 		for( ; e < final; e++)
 		{
 
-			//printf("TEST: %d", strncmp(e->fecha, fecha));
 			if(e->autorNomina == nomina && !strcmp(e->fecha, fecha))
 			{
 		             char * tipo;
@@ -451,6 +323,7 @@ void verMisModelos(Persona * p, Edificacion * e, int personas, int edificaciones
                 else if (tipo=="Torre")
                 {
 					fin = 2 * (e->pisos);
+					
                     printf("Diametros");
                 	for (i=0; i<fin; i++)
         			{
@@ -491,25 +364,28 @@ void verMisModelos(Persona * p, Edificacion * e, int personas, int edificaciones
 		}
         exit(1);
 	}
-    sleep(1); //Para que se vea el menu principal al final...
+    sleep(1); //Para que se vea el menu principal al final... esperar al hijo para poder visualizar bien el menu. No es necesario pero el meno se vuelve confuso si se quita ya que el padre imprime el menu principal primero que el hijo imprime los resultados
 }
 
 
 void reporte(Persona * p, Edificacion * e, int personas, int edificaciones)
 {
-	//char * inicio;
-    //char * fin;
-	char * inicio = malloc(sizeof(char) * 20);
-	char * fin = malloc(sizeof(char) * 20);
+	char * inicio = malloc(sizeof(char) * 20); //fecha inicio
+	char * fin = malloc(sizeof(char) * 20); //fecha fin (rango)
     printf("Ingrese primera fecha (yyyy-mm-dd): ");
     scanf("%s", inicio);
     printf("Ingrese ultima fecha (yyyy-mm-dd): ");
     scanf("%s", fin);
     
+	int cuantosDias = 0; //para ver cuantos dias con modelos existen
+	RelacionFechas * modPorFecha = NULL; //estructura para relacionar fechas con modelos
+	RelacionFechas * inicioF = modPorFecha;
+	RelacionFechas * finF;
 
-	Persona * inicioP = p;
-	Persona * finalP = p + personas;
-	Edificacion * inicioE = e;
+	Persona * inicioP = p; //inicio de arreglo personas
+	Persona * finalP = p + personas; //final
+
+	Edificacion * inicioE = e; //inicio arreglo edificaciones
     Edificacion * finalE = e + edificaciones;
 	for( ; e < finalE; e++)
 	{
@@ -521,26 +397,105 @@ void reporte(Persona * p, Edificacion * e, int personas, int edificaciones)
 			{
 				if (p->nomina == aux)
 				{
-					printf("Nomina -%d\nNombre - %s\nApellido - %s\nNacimiento - %s\nIngreso - %s\nSalario - %d\nPuesto - %s\n\n", p->nomina, p->nombre, p->apellido, p->nacimiento, p->ingreso, p->salario, p->puesto);
+					printf("Persona#%d\n\nNomina -%d\nNombre - %s\nApellido - %s\nNacimiento - %s\nIngreso - %s\nSalario - %d\nPuesto - %s\n\n", p-inicioP, p->nomina, p->nombre, p->apellido, p->nacimiento, p->ingreso, p->salario, p->puesto);
 				}
 			}
 			
+			int agregado=0;
+			RelacionFechas * aux2 = modPorFecha;
+			finF= modPorFecha + cuantosDias; //final del arreglo
+			for( ; aux2 < finF; aux2++)
+			{
 
+				if(aux2!=NULL && !(strcmp(e->fecha, (aux2)->fecha))) //si se encuentra la fecha en el arreglo, agregar 1 a numero
+				{
+					(aux2)->numero += 1; 
+					agregado = 1;
+					//break;
+				}	
+			}
+			if(!agregado) //si no se encontro la fecha en el arreglo...
+			{	
+				
+				modPorFecha = (RelacionFechas *)realloc(modPorFecha,(cuantosDias+1)*sizeof(RelacionFechas));
+				RelacionFechas * aux;
+				aux = modPorFecha + cuantosDias;
+				cuantosDias+=1;
+				(aux)->numero = 1;
+				(aux)->fecha = malloc(sizeof(char)*20);
+				(aux)->fecha = e->fecha;
+				agregado=1;
+				//modPorFecha-=1;
+			}
 		}
-    
 	}
+	//modPorFecha -= cuantosDias;
+	//printf("TEST2\n");
+	RelacionFechas * finalF = modPorFecha + cuantosDias;
+	for ( ; modPorFecha < finalF; modPorFecha++)
+	{
+		printf("\tFECHA: %s - %d PROYECTOS:\n", modPorFecha->fecha, modPorFecha->numero);
+		e = inicioE;
+		for( ; e < finalE; e++)
+		{
+			if(!(strcmp(e->fecha, modPorFecha->fecha)))
+			{
+				/*IMPRESION DE MODELOS*/
+				printf("\n\nPROYECTO\nPisos -%d\nTipo - %d\nPeriodo - %d\nFecha - %s\nAutorNomina - %d\n\n", e->pisos, e->tipo,  e->periodo, e->fecha, e->autorNomina);
 
+				int i;
+				int fin = e->pisos; 
+                printf("Modales");
+            	for (i=0; i<fin; i++)
+            	{
+					printf("\t %d\n", *((e->modales)+i));
+				}
+                if(e->tipo==1)
+				{
+                	if(*((e->dependeTipo)))
+						printf("Siemtria: Si\n");
+                    else
+                    	printf("Simetria: No");
+				}
+                else if (e->tipo==2)
+                {
+					fin = 2 * (e->pisos);
+					
+                    printf("Diametros");
+                	for (i=0; i<fin; i++)
+        			{
+						printf("\t %d\n", *((e->dependeTipo)+i));
+					}
+				}
+                else if (e->tipo==0)
+				{
+                    switch(*((e->dependeTipo)))
+					{
+						case 0: 
+                        {
+							printf("Techo: Monitor\n");
+							break;
+						}
+						case 1: 
+                        {
+							printf("Techo: Dos Aguas\n");
+							break;
+						}
+						case 2: 
+                        {
+							printf("Techo: Creciente\n");
+							break;
+						}
+						default: 
+                        {
+							printf("Techo: No definido\n");
+							break;
+						}
+					}
+					/*FIN DE IMPRESION DE MODELOS*/
+				}
+			}
+		}
+	}
 }
-/*
-typedef struct
-{
-    int pisos;
-    int tipo;
-    int* modales;
-    int periodo;
-    int* dependeTipo;
-    char* fecha;
-    int autorNomina;
-    
-} Edificacion;
-*/
+
