@@ -40,36 +40,31 @@ int main(int argc, char* argv[])
         }
     }
 	process_id = fork();
-	// Indication of fork() failure
+
 	if (process_id < 0)
 	{
 		printf("fork failed!\n");
-		// Return failure in exit status
 		exit(1);
 	}
-	// PARENT PROCESS. Need to kill it.
 
 	if (process_id > 0)
 	{
-		// return success in exit status
+		// MATAR PROCESO PADRE
 		exit(0);
 	}
-	//unmask the file mode
-	umask(0);
-	//set new session
-	sid = setsid();
+	umask(0); //mascara para archivos
+	sid = setsid(); //ya es demonio
 	if(sid < 0)
 	{
-		// Return failure
 		exit(1);
 	}
-	// Change the current working directory to root.
+	
+	// cambiar a root (ya que es el unico directorio siempre presente en UNIX)
 	chdir("/");
-    directorio = opendir("/proc");
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
-	fp = fopen (PATH, "w+");
+	fp = fopen (PATH, "w+"); //abrir PATH que se definio en el define (si esta en root requiere SUDO/permisos)
 
 
     //Empieza el Daemon
@@ -78,25 +73,26 @@ int main(int argc, char* argv[])
 		
         fclose(fp);
         fp = fopen(PATH, "w+"); //borrar el archivo
+        directorio = opendir("/proc"); //volver a abrir el directorio
         while((in_file = readdir(directorio)))
         {
-            if(atoi(in_file->d_name) > 0)
+            if(atoi(in_file->d_name) > 0) //si es un numero ie. es un proceso
             {
                 fprintf(fp, "PROCESO NUMERO: %s\n", in_file->d_name);
-		snprintf(buffer,33, "/proc/%s/status", in_file->d_name);
-                leer = fopen(buffer, "r");
+		        snprintf(buffer,33, "/proc/%s/status", in_file->d_name); 
+                leer = fopen(buffer, "r"); //abrir en modo solo lectura
 		
                 do{
                     unChar = fgetc(leer);
                     fputc(unChar, fp);
-                }while(unChar!=EOF);
-                fclose(leer);
+                }while(unChar!=EOF); //para copiar los contenidos del archivo
+                
+                fclose(leer); //cerrar el archivo de status
             }
         }
-        sleep(minutos * 60);
+        sleep(minutos * 60); //ciclo en minutos
 
 	}
-
-	fclose(fp);
+    //Termina Daemon
 	return (0);
 }
