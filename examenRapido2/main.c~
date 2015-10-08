@@ -1,39 +1,72 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#include <sys/mman.h>
+int valor;
+int * ctrlc = mmap(NULL, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+     int * ctrlz = mmap(NULL, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+     
 void manejador(int ids)
 {
-    printf("--- Estos procesos no pueden ser detenidos ---.\n");
+
+    switch(ids)
+    {
+        case SIGINT:
+            valor++;
+            break;
+        case SIGTSTP:
+            valor--;
+            break;
+        case SIGUSR1:
+            printf("Se ha pulsado %d veces CTRL+C y se ha pulsado %d veces CTRL+Z Acabando...", *ctrlc, *ctrlz);
+    }
 }
 
+void manejador2(int ids)
+{
+
+    switch(ids)
+    {
+        case SIGINT:
+            (*ctrlc)++;
+            break;
+        case SIGTSTP:
+            (*ctrlz)++;
+            break;
+    }
+}
 int main(int argc, const char * argv[]) {
     
     
     pid_t pid;
-    
+     
+     *ctrlc = 0;
+     *ctrlz= 0;
     pid = fork();
     signal(SIGTSTP, manejador);
     if (!pid)
     {
-        sleep(2);
-        if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
-            printf("ERROR: No se pudo establecer el manejador de la señal\n");
-        }
-        printf("[Hijo] Mi pid es %d y el de mi padre es %d.\n", getpid(), getppid());
+        signal(SIGTSTP, manejador2);
+        signal(SIGINT, manejador2);
         int k = 10;
-    
-        while (k-- > 0) {
-            printf(" +++ %d y contando\n", k);
-            sleep(1);
+        while(k--)
+        {
+        sleep(1);
         }
+        kill(getppid(),10);
     
     }
     else
     {
+        valor = 3;
+        signal(SIGUSR1, manejador);
+        signal(SIGTSTP, manejador);
+        signal(SIGINT, manejador);
         while(1)
         {
-        printf("Aparezco cada 3 segundos\n");
-        sleep(3);
+        printf("Aparezco cada %d segundos\n", valor);
+        sleep(valor);
+        
         //wait(NULL);
         }
     }

@@ -2,7 +2,8 @@
 #include <signal.h>
 #include <unistd.h>
 int valor;
-
+int ctrlc = 0;
+int ctrlz = 0;
 void manejador(int ids)
 {
 
@@ -14,9 +15,24 @@ void manejador(int ids)
         case SIGTSTP:
             valor--;
             break;
+        case SIGUSR1:
+            printf("Se ha pulsado %d veces CTRL+C y se ha pulsado %d veces CTRL+Z Acabando...", ctrlc, ctrlz);
     }
 }
 
+void manejador2(int ids)
+{
+
+    switch(ids)
+    {
+        case SIGINT:
+            ctrlc++;
+            break;
+        case SIGTSTP:
+            ctrlz++;
+            break;
+    }
+}
 int main(int argc, const char * argv[]) {
     
     
@@ -26,19 +42,26 @@ int main(int argc, const char * argv[]) {
     signal(SIGTSTP, manejador);
     if (!pid)
     {
-        sleep(10);
-        
+        signal(SIGTSTP, manejador2);
+        signal(SIGINT, manejador2);
+        int k = 10;
+        while(k--)
+        {
+        sleep(1);
+        }
+        kill(getppid(),10);
     
     }
     else
     {
         valor = 3;
+        signal(SIGUSR1, manejador);
         signal(SIGTSTP, manejador);
         signal(SIGINT, manejador);
         while(1)
         {
-        printf("Aparezco cada 3 segundos\n");
-        sleep(3);
+        printf("Aparezco cada %d segundos\n", valor);
+        sleep(valor);
         
         //wait(NULL);
         }
