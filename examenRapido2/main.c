@@ -11,39 +11,27 @@ void manejador(int ids)
     {
         case SIGINT:
             valor++;
+                        ctrlc++;
             break;
         case SIGTSTP:
             valor--;
+                        ctrlz++;
             break;
         case SIGUSR1:
             printf("Se ha pulsado %d veces CTRL+C y se ha pulsado %d veces CTRL+Z Acabando...", ctrlc, ctrlz);
     }
 }
 
-void manejador2(int ids)
-{
 
-    switch(ids)
-    {
-        case SIGINT:
-            ctrlc++;
-            break;
-        case SIGTSTP:
-            ctrlz++;
-            break;
-    }
-}
 int main(int argc, const char * argv[]) {
     
     
     pid_t pid;
     
     pid = fork();
-    signal(SIGTSTP, manejador);
+    //signal(SIGTSTP, manejador);
     if (!pid)
     {
-        signal(SIGTSTP, manejador2);
-        signal(SIGINT, manejador2);
         int k = 10;
         while(k--)
         {

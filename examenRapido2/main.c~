@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
-#include <sys/mman.h>
 int valor;
-int * ctrlc = mmap(NULL, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
-     int * ctrlz = mmap(NULL, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
-     
+int ctrlc = 0;
+int ctrlz = 0;
 void manejador(int ids)
 {
 
@@ -13,41 +11,27 @@ void manejador(int ids)
     {
         case SIGINT:
             valor++;
+                        ctrlc++;
             break;
         case SIGTSTP:
             valor--;
+                        ctrlz++;
             break;
         case SIGUSR1:
-            printf("Se ha pulsado %d veces CTRL+C y se ha pulsado %d veces CTRL+Z Acabando...", *ctrlc, *ctrlz);
+            printf("Se ha pulsado %d veces CTRL+C y se ha pulsado %d veces CTRL+Z Acabando...", ctrlc, ctrlz);
     }
 }
 
-void manejador2(int ids)
-{
 
-    switch(ids)
-    {
-        case SIGINT:
-            (*ctrlc)++;
-            break;
-        case SIGTSTP:
-            (*ctrlz)++;
-            break;
-    }
-}
 int main(int argc, const char * argv[]) {
     
     
     pid_t pid;
-     
-     *ctrlc = 0;
-     *ctrlz= 0;
+    
     pid = fork();
     signal(SIGTSTP, manejador);
     if (!pid)
     {
-        signal(SIGTSTP, manejador2);
-        signal(SIGINT, manejador2);
         int k = 10;
         while(k--)
         {
