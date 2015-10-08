@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+void manejador(int ids)
+{
+    printf("--- Estos procesos no pueden ser detenidos ---.\n");
+}
+
+int main(int argc, const char * argv[]) {
+    
+    
+    pid_t pid;
+    
+    pid = fork();
+    signal(SIGTSTP, manejador);
+    if (!pid)
+    {
+        sleep(2);
+        if (signal(SIGINT, SIG_IGN) == SIG_ERR) {
+            printf("ERROR: No se pudo establecer el manejador de la señal\n");
+        }
+        printf("[Hijo] Mi pid es %d y el de mi padre es %d.\n", getpid(), getppid());
+        int k = 10;
+    
+        while (k-- > 0) {
+            printf(" +++ %d y contando\n", k);
+            sleep(1);
+        }
+    
+    }
+    else
+    {
+        while(1)
+        {
+        printf("Aparezco cada 3 segundos\n");
+        sleep(3);
+        //wait(NULL);
+        }
+    }
+    // A partir de aquí Ctrl+C no termina el programa
+    
+
+    return 0;
+}
