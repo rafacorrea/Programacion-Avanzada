@@ -11,11 +11,11 @@ void manejador(int ids)
     {
         case SIGINT:
             valor++;
-                        ctrlc++;
+            ctrlc++;
             break;
         case SIGTSTP:
             valor--;
-                        ctrlz++;
+            ctrlz++;
             break;
         case SIGUSR1:
             printf("Se ha pulsado %d veces CTRL+C y se ha pulsado %d veces CTRL+Z Acabando...", ctrlc, ctrlz);
@@ -29,12 +29,15 @@ int main(int argc, const char * argv[]) {
     pid_t pid;
     
     pid = fork();
-    signal(SIGTSTP, manejador);
+    //signal(SIGTSTP, manejador);
     if (!pid)
     {
+        signal(SIGTSTP, SIG_IGN);
+        signal(SIGINT, SIG_IGN);
         int k = 10;
         while(k--)
         {
+        printf("%d\n", k);
         sleep(1);
         }
         kill(getppid(),10);
@@ -46,10 +49,14 @@ int main(int argc, const char * argv[]) {
         signal(SIGUSR1, manejador);
         signal(SIGTSTP, manejador);
         signal(SIGINT, manejador);
+        int k;
         while(1)
         {
         printf("Aparezco cada %d segundos\n", valor);
-        sleep(valor);
+        
+        k = valor;
+        while(k--)
+            sleep(1);
         
         //wait(NULL);
         }
