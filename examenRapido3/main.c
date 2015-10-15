@@ -54,6 +54,7 @@ int main(int argc, const char * argv[])
     if(existe == 0)
     {
         system("mkdir datos");
+        printf("Se creo la carpeta\n");
         existe = 1;
     }
     
@@ -62,6 +63,7 @@ int main(int argc, const char * argv[])
     int k = 0;
     while (k < FICHEROS)
     {
+        printf("Creando archivo... (Bloqueando senales)\n");
         int sig;
         grabar = 1;
         sprintf(buffer, "./datos/a%d", k);
@@ -81,8 +83,9 @@ int main(int argc, const char * argv[])
         fclose(fp);
         
     }
-    printf("Imprimiendo informacion ...\n");
+    printf("Imprimiendo informacion ...\n\n");
                        system("ls -lh datos");
+                       sigprocmask(SIG_UNBLOCK, &todas, NULL);
 
     return 0;
 }
