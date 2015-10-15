@@ -21,7 +21,7 @@ DIR * directorio;
 char * buffer[20];
 int existe;
 FILE *fp= NULL;
-int grabar = 1;
+int grabar;
 
 void manejador1(int ids)
 {
@@ -32,18 +32,24 @@ int main(int argc, const char * argv[])
     
     sigset_t pendientes, todas;
     struct dirent* in_file;
+
     sigfillset(&todas);
+
     
     sigdelset(&todas, SIGALRM);
     
+
     sigprocmask(SIG_BLOCK, &todas, NULL);
-    
+
     directorio = opendir("."); //volver a abrir el directorio
+
     while((in_file = readdir(directorio)))
     {
+
         if(strcmp(in_file->d_name, "datos") == 0) //si es un numero ie. es un proceso
         existe = 1;
     }
+                   
     if(existe == 0)
     {
         system("mkdir datos");
@@ -56,16 +62,20 @@ int main(int argc, const char * argv[])
     while (k < FICHEROS)
     {
         grabar = 1;
-        snprintf(buffer, "datos/a%d", k);
+        sprintf(buffer, "./datos/a%d", k);
         k++;
         fp = fopen(buffer, "w+");
+        //char unChar = 'x';
         alarm(TIEMPO);
-        fputc('x', fp);
+        while(grabar){
+            fputc('x', fp);
+        }
         sigpending(&pendientes);
         fclose(fp);
+        
     }
-    
-    system("ls -l");
+    printf("Imprimiendo informacion ...\n");
+                       system("ls -l datos");
 
     return 0;
 }
