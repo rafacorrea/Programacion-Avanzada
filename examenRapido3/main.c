@@ -16,7 +16,7 @@
 
 #define TIEMPO 3
 #define FICHEROS 5
-#define NSIG 64;
+#define NSIG 64
 
 DIR * directorio;
 char * buffer[20];
@@ -75,7 +75,7 @@ int main(int argc, const char * argv[])
             fputc('x', fp);
         }
         sigpending(&pendientes);
-        for(sig=1; sig < 64; sig++)
+        for(sig=1; sig < NSIG; sig++)
         {
             if(sigismember(&pendientes, sig))
                 fprintf(fp, "\nEstaba bloqueada: la senal %d\n", sig);
