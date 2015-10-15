@@ -82,7 +82,7 @@ int main(int argc, const char * argv[])
         
     }
     printf("Imprimiendo informacion ...\n");
-                       system("ls -l datos");
+                       system("ls -lh datos");
 
     return 0;
 }
