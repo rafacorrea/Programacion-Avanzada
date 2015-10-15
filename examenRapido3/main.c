@@ -16,6 +16,7 @@
 
 #define TIEMPO 3
 #define FICHEROS 5
+#define NSIG 64;
 
 DIR * directorio;
 char * buffer[20];
@@ -61,6 +62,7 @@ int main(int argc, const char * argv[])
     int k = 0;
     while (k < FICHEROS)
     {
+        int sig;
         grabar = 1;
         sprintf(buffer, "./datos/a%d", k);
         k++;
@@ -71,6 +73,11 @@ int main(int argc, const char * argv[])
             fputc('x', fp);
         }
         sigpending(&pendientes);
+        for(sig=1; sig < 64; sig++)
+        {
+            if(sigismember(&pendientes, sig))
+                fprintf(fp, "\nEstaba bloqueada: la senal %d\n", sig);
+        }
         fclose(fp);
         
     }
