@@ -31,14 +31,7 @@ void * agente(void * arg)
         while(1)
         {
             pthread_mutex_lock(&mutex);
-            while(pthread_mutex_trylock(&mutex2))
-            {
-                pthread_mutex_unlock(&mutex);
-            
-                pthread_mutex_lock(&mutex);
-            }//pthread_mutex_lock(&mutex); // DOWN
-            //printf("AGENTE!!\n");
-            printf("agente....\n");
+          
             if(!fosforos && !papel && !tabaco)
             {
                 
@@ -53,8 +46,9 @@ void * agente(void * arg)
 
                 /* Termina región crítica */
             }
-            pthread_mutex_unlock(&mutex2); // UP
-            pthread_mutex_unlock(&mutex);
+
+            pthread_mutex_unlock(&mutex2);
+
         }
     
     
@@ -71,21 +65,18 @@ void * fumar(void * arg)
     while(1) {
         
         pthread_mutex_lock(&mutex2);
+
         /* Inicia Región crítica */
-        while(pthread_mutex_trylock(&mutex)){
-            pthread_mutex_unlock(&mutex2);
-            
-            pthread_mutex_lock(&mutex2);
-        
-        }//pthread_mutex_lock(&mutex2);
+
         switch (tid)
         {
            
             case 0: 
                 if (papel && fosforos){
                     printf("[Tabaco]Fumando... Esperando 0-2 segundos...\n");
-                    papel -= 1;
-                    fosforos -= 1;
+                    papel = papel - 1;
+                    fosforos =  fosforos - 1;
+
                     sleep (rand()%3);
                     
                 }
@@ -94,8 +85,9 @@ void * fumar(void * arg)
                 if (tabaco && fosforos){
                     printf("[Papel]Fumando... Esperando 0-2 segundos...\n");
 
-                    tabaco-=1;
-                    fosforos-=1;
+                    tabaco= tabaco -1;
+                    fosforos= fosforos - 1;
+
                     sleep (rand()%3);
                 }
                 break;
@@ -103,14 +95,16 @@ void * fumar(void * arg)
                 if (tabaco && papel){
                     printf("[Fosforos]Fumando... Esperando 0-2 segundos...\n");
                     
-                    tabaco -= 1;
-                    fosforos -= 1;
+                    tabaco = tabaco - 1;
+                    papel = papel - 1;
+
                     sleep (rand()%3);
                 }
                     
         }
         pthread_mutex_unlock(&mutex);
-        pthread_mutex_unlock(&mutex2);
+
+        //sleep(10);
     }
     
     
@@ -123,13 +117,14 @@ int main(int argc, const char * argv[])
     
     pthread_t * tid;
     tid = malloc(4 * sizeof(pthread_t));
+    pthread_mutex_lock(&mutex2);
     
     printf("Creando hilos ...\n");
-    
+        pthread_create(tid+3, NULL, agente, (void *)3);
     pthread_create(tid, NULL, fumar, (void *)0);
     pthread_create(tid+1, NULL, fumar, (void *)1);
     pthread_create(tid+2, NULL, fumar, (void *)2);
-    pthread_create(tid+3, NULL, agente, (void *)3);
+
     
     printf("Se crearon %d hilos ...\n", 4);
     /*
