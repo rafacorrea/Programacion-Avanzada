@@ -38,9 +38,9 @@ void * agente(void * arg)
                 temp = rand() % 3;
                 switch (temp)
                 {
-                    case 0: tabaco += 1; papel += 1; printf("[Agente]Se coloco papel y tabaco\n");break; 
-                    case 1: tabaco += 1; fosforos += 1; printf("[Agente]Se coloco tabaco y fosforos\n");break;
-                    case 2: papel += 1; fosforos += 1; printf("[Agente]Se coloco papel y fosforos\n"); break;
+                    case 0: tabaco = tabaco + 1; papel = papel+ 1; printf("[Agente]Se coloco papel y tabaco\n");break; 
+                    case 1: tabaco = tabaco + 1; fosforos =  fosforos + 1; printf("[Agente]Se coloco tabaco y fosforos\n");break;
+                    case 2: papel = papel + 1; fosforos =  fosforos + 1; printf("[Agente]Se coloco papel y fosforos\n"); break;
                 }
                 /* Podría haber un cambio de contexto */
 
