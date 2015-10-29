@@ -49,15 +49,25 @@ void * threadfunc(void * arg)
     int temp;
     int aux = 0;
     int cuantos = rand()%MAXBOLETOS + 1;
+    
+    complejo = rand()%COMPLEJOS;
+    sala = rand()%SALAS;
+    asiento = rand()%ASIENTOS;
+    temp = complejo * SALAS * ASIENTOS + (sala * ASIENTOS) + asiento;
+            
     while(aux < cuantos)
     {
-        
         sleep(rand()%3 + 1); //Esta decidiendo el comprador..
-        complejo = rand()%COMPLEJOS;
-        sala = rand()%SALAS;
-        asiento = rand()%ASIENTOS;
         
-        temp = complejo * SALAS * ASIENTOS + (sala * ASIENTOS) + asiento;
+        while(asientos[temp]) //revisa de su lado (sin sincronizacion)
+        {
+
+            complejo = rand()%COMPLEJOS;
+            sala = rand()%SALAS;
+            asiento = rand()%ASIENTOS;
+            temp = complejo * SALAS * ASIENTOS + (sala * ASIENTOS) + asiento;
+        }
+       
         pthread_mutex_lock(&(*(mutexes+temp)));
         if(!asientos[temp])
         {
