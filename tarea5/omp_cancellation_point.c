@@ -22,11 +22,15 @@ int main(int argc, const char * argv[]) {
             printf("Ciclo %d por hilo %d\n", i, id);
              if(i>9)
             {
-                printf("Hilo %d: El ciclo en el que estoy es mayor a 9, saliendo del pragma omp for...\n", id);
+                printf("Hilo %d: El ciclo en el que estoy es mayor a 9, saliendo del pragma omp for Y saltando al cancellation point...\n", id);
                 #pragma omp cancel for
             }
+            printf("Se ejecuto correctamente\n");
             #pragma omp cancellation point for
+            
         }
+        
+        
     }
     
     return 0;
